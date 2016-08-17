@@ -10,7 +10,16 @@ var Sectionizer = {
 
     debug: false,
 
-    contentSectionSelector: "#Sectionizer_contentSection",
+    contentSectionSelector: "#Content",
+
+    openedHeadingClass: "openedHeading",
+
+    closedHeadingClass: "closedHeading",
+
+    openedElementClass: "openedElement",
+
+
+    closedElementClass: "closedElement",
 
     init: function(){
         //other stuff
@@ -20,32 +29,39 @@ var Sectionizer = {
 
     coreInits: function(){
 
+        jQuery("h3").each(
+            function(i, el) {
+                jQuery(el)
+                    .attr('id', "SectionizerHeading"+i)
+                    .toggleClass(Sectionizer.closedHeadingClass)
+                    .nextUntil('h3')
+                    .toggleClass(Sectionizer.closedElementClass)
 
+            }
+
+        );
         //add click functionality on H3...
         jQuery("h3")
             .not("doNotSlide")
             .attr("tabIndex", 0)
-            .focus(function(event){
-                jQuery(this).click();
-            })
             .on(
                 'click',
                 function() {
                     if(!jQuery(this).hasClass('doNotSlide')){
                         jQuery(this)
-                            .toggleClass("closed")
-                            .toggleClass("opened");
-                        if(jQuery(this).hasClass('closed')) {
+                            .toggleClass(Sectionizer.closedHeadingClass)
+                            .toggleClass(Sectionizer.openedHeadingClass);
+                        if(jQuery(this).hasClass(Sectionizer.closedHeadingClass)) {
                             jQuery(this)
                                 .nextUntil( "h3" )
-                                .removeClass("openedField")
-                                .addClass("closedField");
+                                .removeClass(Sectionizer.openedElementClass)
+                                .addClass(Sectionizer.closedElementClass);
                         }
                         else {
                             jQuery(this)
                                 .nextUntil( "h3" )
-                                .removeClass("closedField")
-                                .addClass("openedField");
+                                .removeClass(Sectionizer.closedElementClass)
+                                .addClass(Sectionizer.openedElementClass);
                                 document.cookie = "current_section_heading_" + Sectionizer.uniquePageID() + "=" + jQuery(this).attr('id');
                             jQuery('h3.opened').not(this).click();
                         }
@@ -58,10 +74,10 @@ var Sectionizer = {
         jQuery(Sectionizer.contentSectionSelector+' h3').each(
             function(i, el){
                 if(i == 0) {
-                    jQuery(el).addClass("opened");
+                    jQuery(el).addClass(Sectionizer.openedHeadingClass);
                 }
                 else {
-                    jQuery(el).addClass("opened").click();
+                    jQuery(el).addClass(Sectionizer.openedHeadingClass).click();
                 }
             }
         );
@@ -73,7 +89,7 @@ var Sectionizer = {
         var cookie = "current_section_heading_" + this.uniquePageID();
         var id = Sectionizer.getCookie(cookie);
         if(id) {
-            jQuery(Sectionizer.contentSectionSelector+' h3.opened').click();
+            jQuery(Sectionizer.contentSectionSelector+' h3.'+Sectionizer.openedHeadingClass).click();
             if(jQuery("h3#" + id).length > 0) {
                 jQuery("h3#" + id).click();
             }
@@ -104,7 +120,7 @@ var Sectionizer = {
         else {
             console.debug("not visible");
             var previousH3 = jQuery(this).prev("h3:first");
-            if(jQuery(previousH3).hasClass("closed")) {
+            if(jQuery(previousH3).hasClass(Sectionizer.closedHeadingClass)) {
                 jQuery(previousH3).click();
             }
         }
@@ -116,4 +132,3 @@ var Sectionizer = {
 
 
 }
-
