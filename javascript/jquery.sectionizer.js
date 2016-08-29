@@ -10,7 +10,7 @@ var Sectionizer = {
 
     debug: false,
 
-    contentSectionSelector: "#Content",
+    contentSectionSelector: "#contents",
 
     openedHeadingClass: "openedHeading",
 
@@ -29,7 +29,7 @@ var Sectionizer = {
 
     coreInits: function(){
 
-        jQuery("h3").each(
+        jQuery(Sectionizer.contentSectionSelector + " h3").each(
             function(i, el) {
                 jQuery(el)
                     .attr('id', "SectionizerHeading"+i)
@@ -41,13 +41,16 @@ var Sectionizer = {
 
         );
         //add click functionality on H3...
-        jQuery("h3")
+        jQuery(Sectionizer.contentSectionSelector + " h3")
             .not("doNotSlide")
             .attr("tabIndex", 0)
             .on(
                 'click',
                 function() {
+                    jQuery('h3.'+Sectionizer.openedHeadingClass).not(this).click();
+                    //jQuery('#contents').css('visibility', 'hidden');
                     if(!jQuery(this).hasClass('doNotSlide')){
+
                         jQuery(this)
                             .toggleClass(Sectionizer.closedHeadingClass)
                             .toggleClass(Sectionizer.openedHeadingClass);
@@ -63,24 +66,30 @@ var Sectionizer = {
                                 .removeClass(Sectionizer.closedElementClass)
                                 .addClass(Sectionizer.openedElementClass);
                                 document.cookie = "current_section_heading_" + Sectionizer.uniquePageID() + "=" + jQuery(this).attr('id');
-                            jQuery('h3.opened').not(this).click();
+
+                        }
+                        var el = this;
+                        if(jQuery(el).hasClass(Sectionizer.openedHeadingClass)) {
+                          window.setTimeout(
+                              function(){
+                                  jQuery('html, body').animate(
+                                    {
+                                      scrollTop: jQuery(el).offset().top,
+                                    },
+                                    {
+                                      duration: 500,
+                                      complete: function() {jQuery('#contents').fadeIn(); }
+                                    }
+                                  );
+                              },
+                              100
+                          );
                         }
                     }
                 }
             )
 
 
-        //set default open / close...
-        jQuery(Sectionizer.contentSectionSelector+' h3').each(
-            function(i, el){
-                if(i == 0) {
-                    jQuery(el).addClass(Sectionizer.openedHeadingClass);
-                }
-                else {
-                    jQuery(el).addClass(Sectionizer.openedHeadingClass).click();
-                }
-            }
-        );
 
 
     },
@@ -127,7 +136,7 @@ var Sectionizer = {
     },
 
     uniquePageID: function() {
-        return "EVGUIDEUNIQUEID";
+        return "SECTIONIZER_UNIQUE";
     }
 
 
